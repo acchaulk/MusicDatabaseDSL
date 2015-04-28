@@ -17,7 +17,7 @@ import json.templates.*;
 
 public class JSONFetcher {
 
-	
+
 	public static List<String> artistsToString(List<Artist> artists) {
 		List<String> results = new ArrayList<String>();
 		for(Artist s : artists) {
@@ -25,7 +25,7 @@ public class JSONFetcher {
 		}
 		return results;
 	}
-	
+
 	public static List<Artist> stringsToArtists(List<String> strings) {
 		List<Artist> results = new ArrayList<Artist>();
 		Artist a;
@@ -49,14 +49,14 @@ public class JSONFetcher {
 		}
 
 		String URL = "http://developer.echonest.com/api/v4/artist/similar?api_key=DGRSTO8KKQIAWYCPY&format=json&name=" + artist;
-//		System.out.println(URL);
+		//		System.out.println(URL);
 
 
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
-//		System.out.println(responseHolder.response.status.message);
+		//		System.out.println(responseHolder.response.status.message);
 
 		for(Artist s : responseHolder.response.artists) {
-//			System.out.println(s.name.toString());
+			//			System.out.println(s.name.toString());
 		}
 
 		//		Response a = mapper.readValue(HTTP.getJSON(URL, headers), Response.class);
@@ -85,8 +85,10 @@ public class JSONFetcher {
 
 		set.addAll(list1);
 		set.addAll(list2);
+		List<T> list = new ArrayList<T>(set);
 
-		return new ArrayList<T>(set);	
+		return list;
+		//		return new ArrayList<T>(set);	
 	}
 
 
@@ -97,14 +99,14 @@ public class JSONFetcher {
 		ResponseHolder response = null;
 		switch(queryType) {
 		case "ARTIST":
-			System.out.println("Calling ARTIST similarTo");
+			//			System.out.println("Calling ARTIST similarTo");
 			response = artistSimilarTo(queryString);
 			break;
 		case "ALBUM":
-			System.out.println("Calling ALBUM similar to");
+			//			System.out.println("Calling ALBUM similar to");
 			break;
 		case "GENRE":
-			System.out.println("Calling GENRE similar to");
+			//			System.out.println("Calling GENRE similar to");
 			break;
 		}
 		return response;
@@ -113,13 +115,13 @@ public class JSONFetcher {
 	public static void sameGenre(String queryString, String queryType) {
 		switch(queryType) {
 		case "ARTIST":
-			System.out.println("Calling ALBUM sameGenre");
+			//			System.out.println("Calling ALBUM sameGenre");
 			break;
 		case "ALBUM":
-			System.out.println("Calling ALBUM sameGenre");
+			//			System.out.println("Calling ALBUM sameGenre");
 			break;
 		case "GENRE":
-			System.out.println("Calling GENRE sameGenre");
+			//			System.out.println("Calling GENRE sameGenre");
 			break;
 		}
 	}
@@ -127,13 +129,13 @@ public class JSONFetcher {
 	public static void sameDecade(String queryString, String queryType) {
 		switch(queryType) {
 		case "ARTIST":
-			System.out.println("Calling ARTIST sameDecade");
+			//			System.out.println("Calling ARTIST sameDecade");
 			break;
 		case "ALBUM":
-			System.out.println("Calling ALBUM sameDecade");
+			//			System.out.println("Calling ALBUM sameDecade");
 			break;
 		case "GENRE":
-			System.out.println("Calling GENRE sameDecade");
+			//			System.out.println("Calling GENRE sameDecade");
 			break;
 		}
 	}

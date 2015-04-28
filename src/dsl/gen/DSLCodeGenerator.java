@@ -11,6 +11,7 @@
 
 package dsl.gen;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -20,6 +21,8 @@ import json.templates.*;
 import dsl.JSONFetcher;
 import dsl.JsonTutorial;
 import dsl.ast.*;
+import dsl.ast.ASTNode.ASTNodeType;
+import dsl.ast.ASTNodeFactory.QueryNode;
 import dsl.ast.ASTNodeFactory.*;
 import dsl.lexparse.DSLParser;
 import dsl.utility.*;
@@ -36,58 +39,60 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 
 	// 		create playlist artist.similarTo("Nirvana") & artist.similarTo("Foo Fighters")
 	// 		create playlist artist.similarTo("Nirvana") & artist.similarTo("Foo Fighters") | artist.similarTo("Megadeth")
-	public String url = "http://developer.echonest.com/api/v4/artist/similar?api_key=DGRSTO8KKQIAWYCPY&name=Nirvana";
+	// 		create playlist artist.similarTo("Nirvana") & artist.similarTo("Foo Fighters") | artist.similarTo("Pearl Jam")
 
 	public Stack<ResponseHolder> responses;
+	public List<String> excluded;
 
 	public DSLCodeGenerator() {
 		responses = new Stack<ResponseHolder>();
+		excluded = new ArrayList<String>();
 
 	}
 
 	public String visit(CreatePlaylistNode node) {
-		System.out.println("Got to CreatePlaylistNode");
+//		System.out.println("Got to CreatePlaylistNode");
 		visitChildren(node);
+		
+		if(responses.size() == 1) {
+			ResponseHolder r = responses.peek();
+			List<String> artistStrings = JSONFetcher.artistsToString(r.response.artists);
+			System.out.println("--Here are some suggestions for you--");
+			for(String a : excluded) {
+				artistStrings.remove(a);
+			}
+			for(String a : artistStrings) {
+				System.out.println(a.toString());
+			}
+		}
+		
 		return null;
 	}
 
-
 	public String visit(QueryListNode node) {
-		System.out.println("Got to QueryListNode");
+//		System.out.println("Got to QueryListNode");
 
 		if(node.children.size() == 2) {
 			node.getExpr1().accept(this);
 			node.getExpr2().accept(this);
-
-			//		QueryNode query1 = (QueryNode) node.getExpr1();
-			//		QueryNode query2 = (QueryNode) node.getExpr2();
-
+			
 			ResponseHolder response1 = responses.pop();
 			ResponseHolder response2 = responses.pop();
 
 			if(node.getOp() == DSLParser.AND) {
 				if(node.getExpr1().type.toString().equals("ARTIST")) {
-
-					System.out.println(response1.response.artists.toString());
-					List<String> artistStrings = JSONFetcher.andListOp(JSONFetcher.artistsToString(response1.response.artists)
+					List<String> artistStrings = JSONFetcher.andListOp(
+							JSONFetcher.artistsToString(response1.response.artists)
 							, JSONFetcher.artistsToString(response2.response.artists));
 
 					response1.response.artists = JSONFetcher.stringsToArtists(artistStrings);
 					responses.push(response1);
-					for(String a : artistStrings) {
-						System.out.println("ARTIST: " + a.toString());
-					}
 				}
 			}
 			else if (node.getOp() == DSLParser.OR) {
 				if(node.getExpr1().type.toString().equals("ARTIST")) {
-
-					System.out.println(response1.response.artists.toString());
 					List<String> artistStrings = JSONFetcher.orListOp(JSONFetcher.artistsToString(response1.response.artists)
 							, JSONFetcher.artistsToString(response2.response.artists));
-					for(String a : artistStrings) {
-						System.out.println("ARTIST: " + a.toString());
-					}
 
 					response1.response.artists = JSONFetcher.stringsToArtists(artistStrings);
 					responses.push(response1);
@@ -95,33 +100,23 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 			}
 		}
 
-		else {
+		else { // single Query
 			node.getExpr1().accept(this);
 			ResponseHolder response1 = responses.pop();
 			List<String> artistStrings = JSONFetcher.artistsToString(response1.response.artists);
-			for(String a : artistStrings) {
-				System.out.println("ARTIST: " + a.toString());
-			}
 			responses.push(response1);
 
 		}
-
 		return null;
 	}
 
 	public String visit(QueryNode node) {
-		System.out.println("Got to QueryNode");
-		//		System.out.println("Query String: " + node.getQueryStringNode().token.getText());
-		//		System.out.println("Query Function: " + node.getFunction().token.getText());
-		//		System.out.println("Query Type: " +  node.getType().toString());
-
+//		System.out.println("Got to QueryNode");
 
 		String queryFunction = node.getFunction().token.getText(); //similarTo, sameGenre, sameDecade
 		String queryType = node.getType().toString();
 		String queryString = node.getQueryStringNode().token.getText();
-
-
-
+		excluded.add(queryString.replaceAll("^\"|\"$", ""));
 		switch(queryFunction) {
 		case "similarTo": 
 			responses.push(JSONFetcher.similarTo(queryString, queryType));
@@ -132,15 +127,11 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 			break;
 		default: break;
 		}
-
-
-
-
 		return null;
 	}
 
 	public String visit(QueryStringNode node) {
-		System.out.println("Got to QueryStringNode");
+//		System.out.println("Got to QueryStringNode");
 		return null;
 	}
 
