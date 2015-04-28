@@ -14,6 +14,7 @@ import dsl.lexparse.DSLParser;
 import dsl.semantic.TypeChecker;
 import dsl.symbol.SymbolCreator;
 import dsl.utility.DSLFactory;
+import dsl.utility.DijkstraTreeDisplayer;
 
 
 public class DSLRunner {

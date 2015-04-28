@@ -114,8 +114,12 @@ public class ASTCreator extends DSLBaseVisitor<ASTNode> {
 //			t = tn.getSymbol();
 //			QueryStringNode queryString = QueryStringNode.makeQueryNode(t);//ctx.query().queryString().getSymbol()); //TODO fix getSymbol
 //			final DSLType type = DSLType.getType(ctx.query().type().getText());
-//			result = QueryNode.makeQueryNode(type, queryString);
-			result = visitQuery(ctx.query());
+//			result = QueryNode.makeQueryNode(type, null, queryString);
+			
+//			result = QueryListNode.makeQueryListNode(ctx.queryList(0).accept(this));
+			ASTNode q =  visitQuery(ctx.query());
+			result = QueryListNode.makeQueryListNode(q);
+//			result = visitQuery(ctx.query());
 			break;
 		case 3: // QueryList (& |) QueryList
 			if (ctx.queryList().size() == 1) {

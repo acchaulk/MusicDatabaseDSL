@@ -79,6 +79,12 @@ public class ASTNodeFactory {
 				addChild(expr1);
 				addChild(expr2);
 			}
+			
+			public QueryListNode(ASTNode expr) {
+				super();
+				nodeType = QUERYLIST;
+				addChild(expr);
+			}
 
 			public ASTNode getExpr1() {
 				return getChild(0);
@@ -100,6 +106,9 @@ public class ASTNodeFactory {
 			public static QueryListNode makeQueryListNode(Token op,
 					ASTNode expr1, ASTNode expr2) {
 				return new QueryListNode(op, expr1, expr2);
+			}
+			public static QueryListNode makeQueryListNode(ASTNode expr) {
+				return new QueryListNode(expr);
 			}
 		}
 

@@ -83,6 +83,7 @@ public class TypeCheckerTest {
 	@Test
 	public void testIfGenreIsAString() {
 		doTypeCheck("artist.sameGenre(\"Alt Rock\")");
+//		DijkstraTreeDisplayer.showTree(parser, tree);
 	}
 	
 	@Test(expected = DSLSemanticException.class)

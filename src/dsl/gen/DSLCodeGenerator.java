@@ -54,52 +54,63 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 
 	public String visit(QueryListNode node) {
 		System.out.println("Got to QueryListNode");
-		node.getExpr1().accept(this);
-		node.getExpr2().accept(this);
 
-//		QueryNode query1 = (QueryNode) node.getExpr1();
-//		QueryNode query2 = (QueryNode) node.getExpr2();
+		if(node.children.size() == 2) {
+			node.getExpr1().accept(this);
+			node.getExpr2().accept(this);
 
-		ResponseHolder response1 = responses.pop();
-		ResponseHolder response2 = responses.pop();
+			//		QueryNode query1 = (QueryNode) node.getExpr1();
+			//		QueryNode query2 = (QueryNode) node.getExpr2();
 
-		if(node.getOp() == DSLParser.AND) {
-			if(node.getExpr1().type.toString().equals("ARTIST")) {
+			ResponseHolder response1 = responses.pop();
+			ResponseHolder response2 = responses.pop();
 
-				System.out.println(response1.response.artists.toString());
-				List<String> artistStrings = JSONFetcher.andListOp(JSONFetcher.artistsToString(response1.response.artists)
-						, JSONFetcher.artistsToString(response2.response.artists));
-				
-				
-				response1.response.artists = JSONFetcher.stringsToArtists(artistStrings);
-				responses.push(response1);
-				
-				
-				for(String a : artistStrings) {
-					System.out.println("ARTIST: " + a.toString());
+			if(node.getOp() == DSLParser.AND) {
+				if(node.getExpr1().type.toString().equals("ARTIST")) {
+
+					System.out.println(response1.response.artists.toString());
+					List<String> artistStrings = JSONFetcher.andListOp(JSONFetcher.artistsToString(response1.response.artists)
+							, JSONFetcher.artistsToString(response2.response.artists));
+
+					response1.response.artists = JSONFetcher.stringsToArtists(artistStrings);
+					responses.push(response1);
+					for(String a : artistStrings) {
+						System.out.println("ARTIST: " + a.toString());
+					}
+				}
+			}
+			else if (node.getOp() == DSLParser.OR) {
+				if(node.getExpr1().type.toString().equals("ARTIST")) {
+
+					System.out.println(response1.response.artists.toString());
+					List<String> artistStrings = JSONFetcher.orListOp(JSONFetcher.artistsToString(response1.response.artists)
+							, JSONFetcher.artistsToString(response2.response.artists));
+					for(String a : artistStrings) {
+						System.out.println("ARTIST: " + a.toString());
+					}
+
+					response1.response.artists = JSONFetcher.stringsToArtists(artistStrings);
+					responses.push(response1);
 				}
 			}
 		}
-		else if (node.getOp() == DSLParser.OR) {
-			if(node.getExpr1().type.toString().equals("ARTIST")) {
 
-				System.out.println(response1.response.artists.toString());
-				List<String> artistStrings = JSONFetcher.orListOp(JSONFetcher.artistsToString(response1.response.artists)
-						, JSONFetcher.artistsToString(response2.response.artists));
-				for(String a : artistStrings) {
-					System.out.println("ARTIST: " + a.toString());
-				}
-				
-				response1.response.artists = JSONFetcher.stringsToArtists(artistStrings);
-				responses.push(response1);
+		else {
+			node.getExpr1().accept(this);
+			ResponseHolder response1 = responses.pop();
+			List<String> artistStrings = JSONFetcher.artistsToString(response1.response.artists);
+			for(String a : artistStrings) {
+				System.out.println("ARTIST: " + a.toString());
 			}
+			responses.push(response1);
+
 		}
 
 		return null;
 	}
 
 	public String visit(QueryNode node) {
-		//		System.out.println("Got to QueryNode");
+		System.out.println("Got to QueryNode");
 		//		System.out.println("Query String: " + node.getQueryStringNode().token.getText());
 		//		System.out.println("Query Function: " + node.getFunction().token.getText());
 		//		System.out.println("Query Type: " +  node.getType().toString());

@@ -51,18 +51,18 @@ public class TypeChecker extends ASTVisitor<DSLType> {
 	}
 
 	public DSLType visit(QueryNode query) {
-//		System.out.println("Text = " + query.getFunction().token.getText());
-//		System.out.println("Text = " + query.getFunction().token.getText());
-//		System.out.println("Query String = " + query.getQueryStringNode());
-//		System.out.println("To String String =" + query.getQueryStringNode().token.toString());
-		
+		//		System.out.println("Text = " + query.getFunction().token.getText());
+		//		System.out.println("Text = " + query.getFunction().token.getText());
+		//		System.out.println("Query String = " + query.getQueryStringNode());
+		//		System.out.println("To String String =" + query.getQueryStringNode().token.toString());
+
 		if(query.getType().toString().equals("GENRE")) {
 			if(!query.getFunction().token.getText().toLowerCase().equals("similarto")) {
 				throw new DSLSemanticException("Queries for Genre can only be for similarTo");
 			}
 		}
-		
-		
+
+
 		if(query.getFunction().token.getText().toLowerCase().equals("samegenre")) {
 			if(query.getQueryStringNode().token.getText().toLowerCase().matches(".*\\d+.*")) {
 				throw new DSLSemanticException("Cannot have a genre with digit(s)");
@@ -74,28 +74,37 @@ public class TypeChecker extends ASTVisitor<DSLType> {
 
 
 	public DSLType visit(QueryListNode queryList) {
-//		DSLType expected = typeNeeded.peek(); //artist, song, album
+		//		DSLType expected = typeNeeded.peek(); //artist, song, album
 
-//		if (queryList.type == UNDEFINED && expected != queryList.type) {
-//			queryList.type = expected;
-//		}
+		//		if (queryList.type == UNDEFINED && expected != queryList.type) {
+		//			queryList.type = expected;
+		//		}
 
 
-//		typeNeeded.push(need);
-		DSLType expr1Type = queryList.getExpr1().accept(this);
-		DSLType expr2Type = queryList.getExpr2().accept(this);
-//		typeNeeded.pop();
+		//		typeNeeded.push(need);
+		if(queryList.children.size() == 2) {
 
-		
-		if(expr1Type == UNDEFINED || expr2Type == UNDEFINED) {
-			continueChecking = true;
+			DSLType expr1Type = queryList.getExpr1().accept(this);
+			DSLType expr2Type = queryList.getExpr2().accept(this);
+			//		typeNeeded.pop();
+
+
+			if(expr1Type == UNDEFINED || expr2Type == UNDEFINED) {
+				continueChecking = true;
+			}
+			if(expr1Type == expr2Type) {
+				queryList.type = expr1Type;
+			}
+
+			else if(expr1Type != expr2Type) {
+				throw new DSLSemanticException("All queries must have the same type (artist, song, album)");
+			}
 		}
-		if(expr1Type == expr2Type) {
+		
+		else if( queryList.children.size() == 1) {
+			DSLType expr1Type = queryList.getExpr1().accept(this);
 			queryList.type = expr1Type;
-		}
-		
-		else if(expr1Type != expr2Type) {
-			 throw new DSLSemanticException("All queries must have the same type (artist, song, album)");
+			
 		}
 		return queryList.type;
 	}
