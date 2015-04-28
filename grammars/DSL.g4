@@ -32,7 +32,7 @@ query: type DOT function LPAR queryString RPAR;
 
 queryString: YEAR_STRING | STRING_NONUM | STRING;
 function: SAMEDECADE | SIMILARTO | SAMEGENRE;
-type: ARTIST | ALBUM | SONG;
+type: ARTIST | ALBUM | SONG | GENRE;
 
 // Separators and operators
 AND: '&';
@@ -45,6 +45,7 @@ DOT: '.';
 ARTIST: 'artist';
 SONG: 'song';
 ALBUM: 'album';
+GENRE: 'genre';
 SIMILARTO: 'similarTo';
 SAMEDECADE: 'sameDecade';
 SAMEGENRE: 'sameGenre';

@@ -56,6 +56,12 @@ public class TypeChecker extends ASTVisitor<DSLType> {
 //		System.out.println("Query String = " + query.getQueryStringNode());
 //		System.out.println("To String String =" + query.getQueryStringNode().token.toString());
 		
+		if(query.getType().toString().equals("GENRE")) {
+			if(!query.getFunction().token.getText().toLowerCase().equals("similarto")) {
+				throw new DSLSemanticException("Queries for Genre can only be for similarTo");
+			}
+		}
+		
 		
 		if(query.getFunction().token.getText().toLowerCase().equals("samegenre")) {
 			if(query.getQueryStringNode().token.getText().toLowerCase().matches(".*\\d+.*")) {
@@ -80,9 +86,14 @@ public class TypeChecker extends ASTVisitor<DSLType> {
 		DSLType expr2Type = queryList.getExpr2().accept(this);
 //		typeNeeded.pop();
 
+		
 		if(expr1Type == UNDEFINED || expr2Type == UNDEFINED) {
 			continueChecking = true;
 		}
+		if(expr1Type == expr2Type) {
+			queryList.type = expr1Type;
+		}
+		
 		else if(expr1Type != expr2Type) {
 			 throw new DSLSemanticException("All queries must have the same type (artist, song, album)");
 		}

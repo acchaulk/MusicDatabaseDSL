@@ -3,7 +3,7 @@ package dsl.utility;
 
 public enum DSLType {
 
-	SONG, ARTIST, ALBUM, UNDEFINED;
+	SONG, ARTIST, ALBUM, GENRE, UNDEFINED;
 
 	public static DSLType getType(String s)
 	{
@@ -11,6 +11,7 @@ public enum DSLType {
 		case "song": return SONG;
 		case "artist": return ARTIST;
 		case "album": return ALBUM;
+		case "genre": return GENRE;
 		}
 		return UNDEFINED;
 	}

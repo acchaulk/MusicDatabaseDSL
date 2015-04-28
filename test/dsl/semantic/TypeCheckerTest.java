@@ -75,6 +75,12 @@ public class TypeCheckerTest {
 	}
 	
 	@Test
+	public void testLongQuery() {
+		doTypeCheck("artist.sameDecade(\"Nirvana\") & artist.similarTo(\"Nirvana\")"
+				+ "& artist.similarTo(\"Foo Fighters\") & artist.similarTo(\"Pearl Jam\")");
+	}
+	
+	@Test
 	public void testIfGenreIsAString() {
 		doTypeCheck("artist.sameGenre(\"Alt Rock\")");
 	}
@@ -87,6 +93,19 @@ public class TypeCheckerTest {
 	@Test(expected = DSLSemanticException.class)
 	public void testIfGenreIsNotAString2() {
 		doTypeCheck("artist.sameGenre(\"Hello123Goodbye\")");
+	}
+	
+	@Test
+	public void testGenreSimilarto() {
+		doTypeCheck("genre.similarTo(\"Rock\")");
+	}
+	@Test(expected = DSLSemanticException.class)
+	public void testGenreSameDecade() {
+		doTypeCheck("genre.sameDecade(\"Rock\")");
+	}
+	@Test(expected = DSLSemanticException.class)
+	public void testGenreSameGenre() {
+		doTypeCheck("genre.sameGenre(\"Rock\")");
 	}
 	
 
