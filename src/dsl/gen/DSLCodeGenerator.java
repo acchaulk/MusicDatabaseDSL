@@ -22,7 +22,6 @@ import dsl.JSONFetcher;
 import dsl.JsonTutorial;
 import dsl.ast.*;
 import dsl.ast.ASTNode.ASTNodeType;
-import dsl.ast.ASTNodeFactory.QueryNode;
 import dsl.ast.ASTNodeFactory.*;
 import dsl.lexparse.DSLParser;
 import dsl.utility.*;
@@ -40,6 +39,7 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 	// 		create playlist artist.similarTo("Nirvana") & artist.similarTo("Foo Fighters")
 	// 		create playlist artist.similarTo("Nirvana") & artist.similarTo("Foo Fighters") | artist.similarTo("Megadeth")
 	// 		create playlist artist.similarTo("Nirvana") & artist.similarTo("Foo Fighters") | artist.similarTo("Pearl Jam")
+	//		create p artist.similarTo("Nirvana") & artist.sameGenre("Rock") & artist.sameDecade("1990")
 
 	public Stack<ResponseHolder> responses;
 	public List<String> excluded;
@@ -117,13 +117,16 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 		String queryType = node.getType().toString();
 		String queryString = node.getQueryStringNode().token.getText();
 		excluded.add(queryString.replaceAll("^\"|\"$", ""));
+//		System.out.println(queryString);
 		switch(queryFunction) {
 		case "similarTo": 
 			responses.push(JSONFetcher.similarTo(queryString, queryType));
 			break;
 		case "sameGenre": 
+			responses.push(JSONFetcher.sameGenre(queryString, queryType));
 			break;
 		case "sameDecade":
+			responses.push(JSONFetcher.sameDecade(queryString, queryType));
 			break;
 		default: break;
 		}
