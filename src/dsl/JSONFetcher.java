@@ -16,9 +16,45 @@ import org.boon.json.ObjectMapper;
 import json.templates.*;
 
 public class JSONFetcher {
+	
+	// LAST FM 		1d5bb175305c97b01c4316f972dc3bd9
+	// echonest		DGRSTO8KKQIAWYCPY
+	// musicgraph 	473468b3be7f6bfd4ecf7f8f576a799c
+	
+	
+	// album.similarTo	
+	// http://api.musicgraph.com/api/v2/album/search?api_key=473468b3be7f6bfd4ecf7f8f576a799c&top_rated=true&similar_to=Good+Kid+Mad+City
 
+	
+	
+	public static ResponseHolder albumSimilarTo(String album) {
+		ObjectMapper mapper =  JsonFactory.create();
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
+		
+		album = album.replaceAll("^\"|\"$", "");
+		album = convertStringToUTF(album);
+		
+		String URL = "http://api.musicgraph.com/api/v2/album/search?api_key=473468b3be7f6bfd4ecf7f8f576a799c&similar_to=" + album;
+		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
+		return responseHolder;
+	}
+	
 
+	public static ResponseHolder genreSimilarTo(String genre) {
+		ObjectMapper mapper =  JsonFactory.create();
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
+		
+		genre = genre.replaceAll("^\"|\"$", "");
+		genre = convertStringToUTF(genre);
+		genre = genre.toLowerCase();
+//		System.out.println(genre);
+		String URL = "http://developer.echonest.com/api/v4/genre/similar?api_key=DGRSTO8KKQIAWYCPY&bucket=description&name=" + genre;
+		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
 
+		return responseHolder;
+	}
 
 	public static ResponseHolder artistSimilarTo(String artist) {
 
@@ -26,7 +62,7 @@ public class JSONFetcher {
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
 		artist = convertStringToUTF(artist);
-		System.out.println(artist);
+//		System.out.println(artist);
 		String URL = "http://developer.echonest.com/api/v4/artist/similar?api_key=DGRSTO8KKQIAWYCPY&format=json&results=100&min_familiarity=.7&name=" + artist;
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
 
@@ -41,10 +77,10 @@ public class JSONFetcher {
 		genre = genre.replaceAll("^\"|\"$", "");
 		genre = convertStringToUTF(genre);
 		genre = genre.toLowerCase();
-		System.out.println(genre);
+//		System.out.println(genre);
 		
 		String URL = "http://developer.echonest.com/api/v4/artist/search?api_key=DGRSTO8KKQIAWYCPY&format=json&results=100&min_familiarity=.7&genre=" + genre;
-		System.out.println(URL);
+//		System.out.println(URL);
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
 		
 		return responseHolder;
@@ -56,7 +92,7 @@ public class JSONFetcher {
 		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
 		decade = decade.replaceAll("^\"|\"$", "");
 //		decade = decade.toLowerCase();
-		System.out.println(decade);
+//		System.out.println(decade);
 		
 		int year = Integer.parseInt(decade);
 		
@@ -68,14 +104,12 @@ public class JSONFetcher {
 		
 		
 		String URL = "http://developer.echonest.com/api/v4/artist/search?api_key=DGRSTO8KKQIAWYCPY&format=json&results=100&min_familiarity=.7&artist_start_year_before=" + endYear + "&artist_start_year_after=" + startYear;
-		System.out.println(URL);
+//		System.out.println(URL);
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
 		
 		return responseHolder;
 	}
 	
-
-
 
 
 
@@ -90,8 +124,10 @@ public class JSONFetcher {
 			break;
 		case "ALBUM":
 			//			System.out.println("Calling ALBUM similar to");
+			response = albumSimilarTo(queryString);
 			break;
 		case "GENRE":
+			response = genreSimilarTo(queryString);
 			//			System.out.println("Calling GENRE similar to");
 			break;
 		}
@@ -139,12 +175,30 @@ public class JSONFetcher {
 		}
 		return results;
 	}
-
+	
 	public static List<Artist> stringsToArtists(List<String> strings) {
 		List<Artist> results = new ArrayList<Artist>();
 		Artist a;
 		for(String s : strings) {
 			a = new Artist("recreated", s);
+			results.add(a);
+		}
+		return results;
+	}
+	
+	public static List<String> genresToString(List<Genre> genres) {
+		List<String> results = new ArrayList<String>();
+		for(Genre s : genres) {
+			results.add(s.name);
+		}
+		return results;
+	}
+	
+	public static List<Genre> stringsToGenres(List<String> strings) {
+		List<Genre> results = new ArrayList<Genre>();
+		Genre a;
+		for(String s : strings) {
+			a = new Genre("recreated", s, "recreated");
 			results.add(a);
 		}
 		return results;

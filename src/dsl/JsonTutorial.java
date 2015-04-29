@@ -8,6 +8,7 @@ import org.boon.json.JsonFactory;
 import org.boon.json.ObjectMapper;
 
 import json.templates.*;
+import json.templates.albums.Data;
 
 import java.io.File;
 import java.io.InputStream;
@@ -275,10 +276,18 @@ public class JsonTutorial {
 		//        part2();
 		//        System.out.println("-------------");
 //		artistTest();
-		artistSimilarTo("Foo Fighters");
-//		EchoNestBoonTest a = new EchoNestBoonTest();
-//		a.testReadArtists();
-
+//		artistSimilarTo("Foo Fighters");
+//		ResponseHolder r = JSONFetcher.genreSimilarTo("metal");
+//		
+//		for(Genre g : r.response.genres) {
+//			System.out.println(g.name);
+//		}
+		
+		ResponseHolder r = JSONFetcher.albumSimilarTo("Nevermind");
+		for(Data d : r.data) {
+			System.out.println("Album Name: " + d.title + ", Artist Name: " + d.performer_name);
+		}
+		
 	}
 	
 	public static void artistSimilarTo(String artist) {

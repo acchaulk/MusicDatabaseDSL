@@ -46,7 +46,7 @@ public class DSLRunner {
 			}
 			else { //run dsl statement
 
-				System.out.println("output: " + commandLine);
+//				System.out.println("output: " + commandLine);
 				try
 				{
 					fileContents = new Scanner(commandLine).useDelimiter("\\A").next();
