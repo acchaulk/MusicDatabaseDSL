@@ -11,7 +11,9 @@
 
 package dsl.gen;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
@@ -19,11 +21,11 @@ import org.boon.json.serializers.impl.JsonSimpleSerializerImpl;
 
 import json.templates.*;
 import json.templates.albums.Data;
+import json.templates.song.Song;
 import dsl.JSONFetcher;
 import dsl.JsonTutorial;
 import dsl.ast.*;
 import dsl.ast.ASTNode.ASTNodeType;
-import dsl.ast.ASTNodeFactory.QueryNode;
 import dsl.ast.ASTNodeFactory.*;
 import dsl.lexparse.DSLParser;
 import dsl.utility.*;
@@ -43,10 +45,18 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 	// 		create playlist artist.similarTo("Nirvana") & artist.similarTo("Foo Fighters") | artist.similarTo("Pearl Jam")
 	//		create p artist.similarTo("Nirvana") & artist.sameGenre("Rock") & artist.sameDecade("1990")
 	//		create p artist.similarTo("britney spears") & artist.sameGenre("Pop") & artist.sameDecade("1990")
-	//		(artist.sameGenre("Pop") & artist.sameDecade("1990")) | artist.sameGenre("rock")
+	//		create p (artist.sameGenre("Pop") & artist.sameDecade("1990")) | artist.sameGenre("rock")
 	//		create p genre.similarTo("metal")
 	// 		create p album.similarTo("Nevermind") | album.similarTo("Ten")
 	//		create p album.similarTo("Britney") & album.sameGenre("pop")
+	// 		create p song.similarTo("Kendrick Lamar King Kunta") & song.sameGenre("rap")
+
+	
+	
+	// create playlist artist.similarTo("Nirvana") & artist.similarTo("Foo Fighters")
+	// create playlist artist.similarTo("britney spears") & artist.sameGenre("Pop") & artist.sameDecade("1990")
+	// create p genre.similarTo("metal")
+	// create playlist song.similarTo("Nirvana Smells Like Teen Spirit") & song.sameGenre("grunge")
 
 	public Stack<ResponseHolder> responses;
 	public List<String> excluded;
@@ -60,7 +70,7 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 
 	public String visit(CreatePlaylistNode node) {
 		visitChildren(node); // main entry point
-		
+
 		if(responses.size() == 1) {
 			ResponseHolder r = responses.peek();
 			if(type.equals("ARTIST")) {
@@ -108,6 +118,21 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 					System.out.println("--I could not find any similar albums for you--");
 				}
 			}
+			else if(type.equals("SONG")) {
+				if(r.response.songs.length > 0) {
+					System.out.println(r.response.songs.length);
+					System.out.println("--Here are some suggested songs for you--");
+					for(Song s : r.response.songs) {
+//						if(!excluded.contains(s.title)) {
+						if(s != null)
+							System.out.println("Song Name: " + s.title + ", Artist Name: " + s.artist_name);
+//						}
+					}
+				}
+				else {
+					System.out.println("--I could not find any similar songs for you--");
+				}
+			}
 		}
 
 		return null;
@@ -150,7 +175,7 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 						String q2 = ((QueryNode) node.getExpr2().getChild(0)).getQueryStringNode().token.getText();
 
 						ResponseHolder r = combinedAlbumQuery(s1, s2, q1, q2);
-//						System.out.println("R SIZE" + r.data.size());
+						//						System.out.println("R SIZE" + r.data.size());
 						if(r == null) {
 							response1.data = JSONFetcher.andListOp(response1.data, response2.data);
 							responses.push(response1);
@@ -166,13 +191,12 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 						}
 						responses.push(response1);
 					}
-//					response1.data = JSONFetcher.andListOp(response1.data, response2.data);
-//					responses.push(response1);
 				}
-//				else {
-//					response1.data = JSONFetcher.andListOp(response1.data, response2.data);
-//					responses.push(response1);
-//				}
+				else if(type.equals("SONG")) {
+					response1.response.songs = JSONFetcher.andArrayOp(response1.response.songs, response2.response.songs);
+					responses.push(response1);
+				}
+				
 			}
 
 			/* Handle OP op */
@@ -194,6 +218,12 @@ public class DSLCodeGenerator extends ASTVisitor<String> {
 				}
 				else if(type.equals("ALBUM")) {
 					response1.data = JSONFetcher.orListOp(response1.data, response2.data);
+					responses.push(response1);
+				}
+
+				else if(type.equals("SONG")) {
+					//					response1.response.songs = null;
+					response1.response.songs = JSONFetcher.orArrayOp(response1.response.songs, response2.response.songs);
 					responses.push(response1);
 				}
 			}

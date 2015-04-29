@@ -284,7 +284,8 @@ public class JsonTutorial {
 //			System.out.println(g.name);
 //		}
 		
-		ResponseHolder r = JSONFetcher.songSameGenre("rap");
+//		ResponseHolder r = JSONFetcher.songSameGenre("rap");
+		ResponseHolder r = JSONFetcher.songSimilarTo("Kendrick Lamar King Kunta");
 		int count = 1;
 		for(Song d : r.response.songs) {
 			System.out.println(count + " Song Name : " + d.title + ", Artist Name: " + d.artist_name);

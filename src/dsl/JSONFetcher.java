@@ -8,12 +8,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.boon.HTTP;
 import org.boon.json.JsonFactory;
 import org.boon.json.ObjectMapper;
 
 import json.templates.*;
+import json.templates.song.Song;
+import json.templates.song.SongComparator;
 
 public class JSONFetcher {
 
@@ -30,18 +33,17 @@ public class JSONFetcher {
 	//	world, show music, contemporary christian, drum n' bass, techno, latin jazz, swing, latin pop, 
 	//	latin rock, latin urban, mpb, regional mexican, salsa, tango, pop ballad, pop rock, 90's rock, 
 	//	adult contemporary, metal, television, tropical
-	
-	
-	
-	public static ResponseHolder songSimilarTo(String title, String artist) {
-		
+
+
+
+	public static ResponseHolder songSimilarTo(String titleSongCombined) {
+
 		ObjectMapper mapper =  JsonFactory.create();
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
-		artist = convertStringToUTF(artist);
-		title = convertStringToUTF(title);
+		titleSongCombined = convertStringToUTF(titleSongCombined);
 		//		System.out.println(artist);
-		String URL = "http://developer.echonest.com/api/v4/song/search?api_key=DGRSTO8KKQIAWYCPY&format=json&results=1&artist=" + artist + "&title=" + title;
+		String URL = "http://developer.echonest.com/api/v4/song/search?api_key=DGRSTO8KKQIAWYCPY&format=json&results=1&combined=" + titleSongCombined;
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
 
 		String id = "";
@@ -49,13 +51,13 @@ public class JSONFetcher {
 			id = responseHolder.response.songs[0].id;
 		}
 		System.out.println("SONG ID: " + id);
-		
+
 		URL = "http://developer.echonest.com/api/v4/playlist/static?api_key=DGRSTO8KKQIAWYCPY&song_id=" + id +
-				"&format=json&results=20&type=song-radio";
+				"&format=json&results=100&type=song-radio";
 		responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
 		return responseHolder;
 	}
-	
+
 	public static ResponseHolder songSameGenre(String genre) {
 		ObjectMapper mapper =  JsonFactory.create();
 		Map<String, String> headers = new HashMap<String, String>();
@@ -69,7 +71,7 @@ public class JSONFetcher {
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
 		return responseHolder;
 	}
-	
+
 
 
 	public static ResponseHolder albumCombinedQueries(String genre, String similarTo, String decade) {
@@ -228,6 +230,8 @@ public class JSONFetcher {
 		case "GENRE":
 			response = genreSimilarTo(queryString);
 			break;
+		case "SONG":
+			response = songSimilarTo(queryString);
 		}
 		return response;
 	}
@@ -241,7 +245,8 @@ public class JSONFetcher {
 		case "ALBUM":
 			response = albumSameGenre(queryString);
 			break;
-		case "GENRE":
+		case "SONG":
+			response = songSameGenre(queryString);
 			break;
 		}
 		return response;
@@ -296,6 +301,34 @@ public class JSONFetcher {
 			results.add(a);
 		}
 		return results;
+	}
+
+	public static Song[] andArrayOp(Song[] arrayOne, Song[] arrayTwo) {
+		Song[] songs = new Song[Integer.max(arrayOne.length,arrayTwo.length)];
+		int ctr = 0;
+		for (int i=0; i < arrayOne.length; i++){
+			for (int j=0; j<arrayTwo.length; j++){
+				if (arrayOne[j].equals(arrayTwo[i])) { 
+					songs[ctr] = arrayOne[j];
+					ctr += 1;
+				}
+			}
+		}
+		return songs;
+	}
+
+	public static Song[] orArrayOp(Song[] arrayOne, Song[] arrayTwo) {
+
+		TreeSet<Song> hashedArray = new TreeSet<Song>(new SongComparator());
+		for (Song entry : arrayOne) {
+			hashedArray.add(entry);
+		}
+
+		for (Song entry : arrayTwo) {
+			hashedArray.add(entry);
+		}
+
+		return hashedArray.toArray(new Song[0]);
 	}
 
 	public static <T> List<T> andListOp(List<T> list1, List<T> list2) {
