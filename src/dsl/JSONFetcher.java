@@ -16,40 +16,141 @@ import org.boon.json.ObjectMapper;
 import json.templates.*;
 
 public class JSONFetcher {
-	
+
 	// LAST FM 		1d5bb175305c97b01c4316f972dc3bd9
 	// echonest		DGRSTO8KKQIAWYCPY
 	// musicgraph 	473468b3be7f6bfd4ecf7f8f576a799c
-	
-	
+
+
 	// album.similarTo	
 	// http://api.musicgraph.com/api/v2/album/search?api_key=473468b3be7f6bfd4ecf7f8f576a799c&top_rated=true&similar_to=Good+Kid+Mad+City
-
+	// alternative/indie, blues, cast recordings/cabaret, christian/gospel, children's, 
+	//	classical/opera, comedy/spoken word, country, electronica/dance, folk, instrumental, jazz, 
+	//	latin, new age, pop, rap/hip hop, reggae/ska, rock, seasonal, soul/r&b, soundtracks, vocals, 
+	//	world, show music, contemporary christian, drum n' bass, techno, latin jazz, swing, latin pop, 
+	//	latin rock, latin urban, mpb, regional mexican, salsa, tango, pop ballad, pop rock, 90's rock, 
+	//	adult contemporary, metal, television, tropical
 	
 	
-	public static ResponseHolder albumSimilarTo(String album) {
+	
+	public static ResponseHolder songSimilarTo(String title, String artist) {
+		
 		ObjectMapper mapper =  JsonFactory.create();
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
+		artist = convertStringToUTF(artist);
+		title = convertStringToUTF(title);
+		//		System.out.println(artist);
+		String URL = "http://developer.echonest.com/api/v4/song/search?api_key=DGRSTO8KKQIAWYCPY&format=json&results=1&artist=" + artist + "&title=" + title;
+		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
+
+		String id = "";
+		if(responseHolder.response.songs[0].id != null) {
+			id = responseHolder.response.songs[0].id;
+		}
+		System.out.println("SONG ID: " + id);
 		
-		album = album.replaceAll("^\"|\"$", "");
-		album = convertStringToUTF(album);
-		
-		String URL = "http://api.musicgraph.com/api/v2/album/search?api_key=473468b3be7f6bfd4ecf7f8f576a799c&similar_to=" + album;
+		URL = "http://developer.echonest.com/api/v4/playlist/static?api_key=DGRSTO8KKQIAWYCPY&song_id=" + id +
+				"&format=json&results=20&type=song-radio";
+		responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
+		return responseHolder;
+	}
+	
+	public static ResponseHolder songSameGenre(String genre) {
+		ObjectMapper mapper =  JsonFactory.create();
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
+
+		genre = genre.replaceAll("^\"|\"$", "");
+		genre = convertStringToUTF(genre);
+
+		String URL = "http://developer.echonest.com/api/v4/playlist/static?api_key=DGRSTO8KKQIAWYCPY&format=json&results=100&type=genre-radio&genre=" + genre;
+		//		System.out.println(URL);
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
 		return responseHolder;
 	}
 	
 
+
+	public static ResponseHolder albumCombinedQueries(String genre, String similarTo, String decade) {
+		ObjectMapper mapper =  JsonFactory.create();
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
+
+		genre = genre.replaceAll("^\"|\"$", "");
+		genre = convertStringToUTF(genre);
+
+		similarTo = similarTo.replaceAll("^\"|\"$", "");
+		similarTo = convertStringToUTF(similarTo);
+
+		decade = decade.replaceAll("^\"|\"$", "");
+		decade = convertStringToDecade(decade);
+		decade = convertStringToUTF(decade);
+
+		String URL = "http://api.musicgraph.com/api/v2/album/search?api_key=473468b3be7f6bfd4ecf7f8f576a799c"
+				+ "&top_rated=true&limit=100&genre=" + genre + "&similar_to=" + similarTo + "&decade=" + decade;
+		System.out.println(URL);
+		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
+		return responseHolder;
+
+	}
+
+	public static ResponseHolder albumSameGenre(String genre) {
+		ObjectMapper mapper =  JsonFactory.create();
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
+
+		genre = genre.replaceAll("^\"|\"$", "");
+		genre = convertStringToUTF(genre);
+
+		String URL = "http://api.musicgraph.com/api/v2/album/search?api_key=473468b3be7f6bfd4ecf7f8f576a799c&top_rated=true&limit=100&genre=" + genre;
+		//		System.out.println(URL);
+		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
+		return responseHolder;
+	}
+
+	public static ResponseHolder albumSimilarTo(String album) {
+		ObjectMapper mapper =  JsonFactory.create();
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
+
+		album = album.replaceAll("^\"|\"$", "");
+		album = convertStringToUTF(album);
+
+		String URL = "http://api.musicgraph.com/api/v2/album/search?api_key=473468b3be7f6bfd4ecf7f8f576a799c&limit=100&similar_to=" + album;
+		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
+		return responseHolder;
+	}
+
+	public static ResponseHolder albumSameDecade(String decade) {
+		ObjectMapper mapper =  JsonFactory.create();
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
+
+		decade = decade.replaceAll("^\"|\"$", "");
+		decade = convertStringToDecade(decade);
+		decade = convertStringToUTF(decade);
+		//		System.out.println(decade);
+
+		String URL = "http://api.musicgraph.com/api/v2/album/search?api_key=473468b3be7f6bfd4ecf7f8f576a799c&top_rated=true&limit=100&decade=" + decade;
+		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
+		//		System.out.println(URL);
+		return responseHolder;
+	}
+
+
+
+
+
 	public static ResponseHolder genreSimilarTo(String genre) {
 		ObjectMapper mapper =  JsonFactory.create();
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
-		
+
 		genre = genre.replaceAll("^\"|\"$", "");
 		genre = convertStringToUTF(genre);
 		genre = genre.toLowerCase();
-//		System.out.println(genre);
+		//		System.out.println(genre);
 		String URL = "http://developer.echonest.com/api/v4/genre/similar?api_key=DGRSTO8KKQIAWYCPY&bucket=description&name=" + genre;
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
 
@@ -62,14 +163,14 @@ public class JSONFetcher {
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
 		artist = convertStringToUTF(artist);
-//		System.out.println(artist);
+		//		System.out.println(artist);
 		String URL = "http://developer.echonest.com/api/v4/artist/similar?api_key=DGRSTO8KKQIAWYCPY&format=json&results=100&min_familiarity=.7&name=" + artist;
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
 
 		return responseHolder;
 
 	}
-	
+
 	public static ResponseHolder artistSameGenre(String genre) {
 		ObjectMapper mapper =  JsonFactory.create();
 		Map<String, String> headers = new HashMap<String, String>();
@@ -77,39 +178,39 @@ public class JSONFetcher {
 		genre = genre.replaceAll("^\"|\"$", "");
 		genre = convertStringToUTF(genre);
 		genre = genre.toLowerCase();
-//		System.out.println(genre);
-		
+		//		System.out.println(genre);
+
 		String URL = "http://developer.echonest.com/api/v4/artist/search?api_key=DGRSTO8KKQIAWYCPY&format=json&results=100&min_familiarity=.7&genre=" + genre;
-//		System.out.println(URL);
+		//		System.out.println(URL);
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
-		
+
 		return responseHolder;
 	}
-	
+
 	public static ResponseHolder artistSameDecade(String decade) {
 		ObjectMapper mapper =  JsonFactory.create();
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("User-Agent", "Musicbrainz School Projcet/1.0 ( acchaulk@wpi.edu )");
 		decade = decade.replaceAll("^\"|\"$", "");
-//		decade = decade.toLowerCase();
-//		System.out.println(decade);
-		
+		//		decade = decade.toLowerCase();
+		//		System.out.println(decade);
+
 		int year = Integer.parseInt(decade);
-		
+
 		int mod = year % 10;
 		String startYear = Integer.toString(year - mod - 1);
 		String endYear = Integer.toString(year - mod + 10);
 		startYear = convertStringToUTF(startYear);
 		endYear = convertStringToUTF(endYear);
-		
-		
+
+
 		String URL = "http://developer.echonest.com/api/v4/artist/search?api_key=DGRSTO8KKQIAWYCPY&format=json&results=100&min_familiarity=.7&artist_start_year_before=" + endYear + "&artist_start_year_after=" + startYear;
-//		System.out.println(URL);
+		//		System.out.println(URL);
 		ResponseHolder responseHolder = mapper.readValue(HTTP.get(URL), ResponseHolder.class);
-		
+
 		return responseHolder;
 	}
-	
+
 
 
 
@@ -119,16 +220,13 @@ public class JSONFetcher {
 		ResponseHolder response = null;
 		switch(queryType) {
 		case "ARTIST":
-			//			System.out.println("Calling ARTIST similarTo");
 			response = artistSimilarTo(queryString);
 			break;
 		case "ALBUM":
-			//			System.out.println("Calling ALBUM similar to");
 			response = albumSimilarTo(queryString);
 			break;
 		case "GENRE":
 			response = genreSimilarTo(queryString);
-			//			System.out.println("Calling GENRE similar to");
 			break;
 		}
 		return response;
@@ -139,13 +237,11 @@ public class JSONFetcher {
 		switch(queryType) {
 		case "ARTIST":
 			response = artistSameGenre(queryString);
-			//			System.out.println("Calling ALBUM sameGenre");
 			break;
 		case "ALBUM":
-			//			System.out.println("Calling ALBUM sameGenre");
+			response = albumSameGenre(queryString);
 			break;
 		case "GENRE":
-			//			System.out.println("Calling GENRE sameGenre");
 			break;
 		}
 		return response;
@@ -156,18 +252,16 @@ public class JSONFetcher {
 		switch(queryType) {
 		case "ARTIST":
 			response = artistSameDecade(queryString);
-			//			System.out.println("Calling ARTIST sameDecade");
 			break;
 		case "ALBUM":
-			//			System.out.println("Calling ALBUM sameDecade");
+			response = albumSameDecade(queryString);
 			break;
 		case "GENRE":
-			//			System.out.println("Calling GENRE sameDecade");
 			break;
 		}
 		return response;
 	}
-	
+
 	public static List<String> artistsToString(List<Artist> artists) {
 		List<String> results = new ArrayList<String>();
 		for(Artist s : artists) {
@@ -175,7 +269,7 @@ public class JSONFetcher {
 		}
 		return results;
 	}
-	
+
 	public static List<Artist> stringsToArtists(List<String> strings) {
 		List<Artist> results = new ArrayList<Artist>();
 		Artist a;
@@ -185,7 +279,7 @@ public class JSONFetcher {
 		}
 		return results;
 	}
-	
+
 	public static List<String> genresToString(List<Genre> genres) {
 		List<String> results = new ArrayList<String>();
 		for(Genre s : genres) {
@@ -193,7 +287,7 @@ public class JSONFetcher {
 		}
 		return results;
 	}
-	
+
 	public static List<Genre> stringsToGenres(List<String> strings) {
 		List<Genre> results = new ArrayList<Genre>();
 		Genre a;
@@ -203,7 +297,7 @@ public class JSONFetcher {
 		}
 		return results;
 	}
-	
+
 	public static <T> List<T> andListOp(List<T> list1, List<T> list2) {
 		List<T> results = new ArrayList<T>();
 
@@ -226,7 +320,7 @@ public class JSONFetcher {
 		return list;
 		//		return new ArrayList<T>(set);	
 	}
-	
+
 	public static String convertStringToUTF(String s) {
 		String result = null;
 		try {
@@ -235,6 +329,18 @@ public class JSONFetcher {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	public static String convertStringToDecade(String s) {
+		if(!s.isEmpty()) {
+			int year = Integer.parseInt(s);
+			int mod = year % 10;
+			int decade = year - mod;
+			String result =  Integer.toString(decade);
+			result += "s";
+			return result;
+		}
+		return "";
 	}
 
 }

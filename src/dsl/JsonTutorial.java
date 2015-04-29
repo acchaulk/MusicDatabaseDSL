@@ -9,6 +9,7 @@ import org.boon.json.ObjectMapper;
 
 import json.templates.*;
 import json.templates.albums.Data;
+import json.templates.song.Song;
 
 import java.io.File;
 import java.io.InputStream;
@@ -283,9 +284,11 @@ public class JsonTutorial {
 //			System.out.println(g.name);
 //		}
 		
-		ResponseHolder r = JSONFetcher.albumSimilarTo("Nevermind");
-		for(Data d : r.data) {
-			System.out.println("Album Name: " + d.title + ", Artist Name: " + d.performer_name);
+		ResponseHolder r = JSONFetcher.songSameGenre("rap");
+		int count = 1;
+		for(Song d : r.response.songs) {
+			System.out.println(count + " Song Name : " + d.title + ", Artist Name: " + d.artist_name);
+			count++;
 		}
 		
 	}

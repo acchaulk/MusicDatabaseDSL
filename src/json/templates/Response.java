@@ -2,10 +2,13 @@ package json.templates;
 
 import java.util.List;
 
+import json.templates.song.Song;
+
 public class Response {
     public Status status;
     public List<Artist> artists;
     public List<Genre> genres;
+    public Song[] songs;
 
 
     public Response(Status status, List<Artist> artists) {
@@ -18,6 +21,12 @@ public class Response {
     	super();
         this.status = status;
         this.genres = genres;
+    }
+    
+    public Response(Song[] songs, Status status) {
+    	super();
+        this.status = status;
+        this.songs = songs;
     }
  
     @Override

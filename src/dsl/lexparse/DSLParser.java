@@ -184,14 +184,16 @@ public class DSLParser extends Parser {
 	}
 
 	public static class QueryListContext extends ParserRuleContext {
-		public QueryContext query() {
-			return getRuleContext(QueryContext.class,0);
-		}
+		public TerminalNode LPAR() { return getToken(DSLParser.LPAR, 0); }
 		public List<QueryListContext> queryList() {
 			return getRuleContexts(QueryListContext.class);
 		}
 		public QueryListContext queryList(int i) {
 			return getRuleContext(QueryListContext.class,i);
+		}
+		public TerminalNode RPAR() { return getToken(DSLParser.RPAR, 0); }
+		public QueryContext query() {
+			return getRuleContext(QueryContext.class,0);
 		}
 		public TerminalNode AND() { return getToken(DSLParser.AND, 0); }
 		public TerminalNode OR() { return getToken(DSLParser.OR, 0); }
@@ -229,30 +231,50 @@ public class DSLParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			{
-			setState(22);
-			query();
+			setState(27);
+			switch (_input.LA(1)) {
+			case LPAR:
+				{
+				setState(22);
+				match(LPAR);
+				setState(23);
+				queryList(0);
+				setState(24);
+				match(RPAR);
+				}
+				break;
+			case ARTIST:
+			case SONG:
+			case ALBUM:
+			case GENRE:
+				{
+				setState(26);
+				query();
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(32);
+			setState(37);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,1,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(30);
-					switch ( getInterpreter().adaptivePredict(_input,0,_ctx) ) {
+					setState(35);
+					switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
 					case 1:
 						{
 						_localctx = new QueryListContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_queryList);
-						setState(24);
+						setState(29);
 						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
-						setState(25);
+						setState(30);
 						match(AND);
-						setState(26);
+						setState(31);
 						queryList(4);
 						}
 						break;
@@ -260,20 +282,20 @@ public class DSLParser extends Parser {
 						{
 						_localctx = new QueryListContext(_parentctx, _parentState);
 						pushNewRecursionContext(_localctx, _startState, RULE_queryList);
-						setState(27);
+						setState(32);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-						setState(28);
+						setState(33);
 						match(OR);
-						setState(29);
+						setState(34);
 						queryList(3);
 						}
 						break;
 					}
 					} 
 				}
-				setState(34);
+				setState(39);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,1,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
 			}
 			}
 		}
@@ -326,17 +348,17 @@ public class DSLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(35);
-			type();
-			setState(36);
-			match(DOT);
-			setState(37);
-			function();
-			setState(38);
-			match(LPAR);
-			setState(39);
-			queryString();
 			setState(40);
+			type();
+			setState(41);
+			match(DOT);
+			setState(42);
+			function();
+			setState(43);
+			match(LPAR);
+			setState(44);
+			queryString();
+			setState(45);
 			match(RPAR);
 			}
 		}
@@ -381,7 +403,7 @@ public class DSLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(42);
+			setState(47);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << YEAR_STRING) | (1L << STRING_NONUM) | (1L << STRING))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -431,7 +453,7 @@ public class DSLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(44);
+			setState(49);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << SIMILARTO) | (1L << SAMEDECADE) | (1L << SAMEGENRE))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -482,7 +504,7 @@ public class DSLParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(46);
+			setState(51);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << ARTIST) | (1L << SONG) | (1L << ALBUM) | (1L << GENRE))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -520,19 +542,20 @@ public class DSLParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\26\63\4\2\t\2\4\3"+
-		"\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\3\2\3\2\3\2\3\3\3\3\3\3\3"+
-		"\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\7\4!\n\4\f\4\16\4$\13\4\3\5\3\5"+
-		"\3\5\3\5\3\5\3\5\3\5\3\6\3\6\3\7\3\7\3\b\3\b\3\b\2\3\6\t\2\4\6\b\n\f\16"+
-		"\2\5\3\2\21\23\3\2\f\16\3\2\b\13-\2\20\3\2\2\2\4\23\3\2\2\2\6\27\3\2\2"+
-		"\2\b%\3\2\2\2\n,\3\2\2\2\f.\3\2\2\2\16\60\3\2\2\2\20\21\5\4\3\2\21\22"+
-		"\7\2\2\3\22\3\3\2\2\2\23\24\7\17\2\2\24\25\7\26\2\2\25\26\5\6\4\2\26\5"+
-		"\3\2\2\2\27\30\b\4\1\2\30\31\5\b\5\2\31\"\3\2\2\2\32\33\f\5\2\2\33\34"+
-		"\7\3\2\2\34!\5\6\4\6\35\36\f\4\2\2\36\37\7\4\2\2\37!\5\6\4\5 \32\3\2\2"+
-		"\2 \35\3\2\2\2!$\3\2\2\2\" \3\2\2\2\"#\3\2\2\2#\7\3\2\2\2$\"\3\2\2\2%"+
-		"&\5\16\b\2&\'\7\7\2\2\'(\5\f\7\2()\7\5\2\2)*\5\n\6\2*+\7\6\2\2+\t\3\2"+
-		"\2\2,-\t\2\2\2-\13\3\2\2\2./\t\3\2\2/\r\3\2\2\2\60\61\t\4\2\2\61\17\3"+
-		"\2\2\2\4 \"";
+		"\3\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd\3\268\4\2\t\2\4\3\t"+
+		"\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\3\2\3\2\3\2\3\3\3\3\3\3\3\3"+
+		"\3\4\3\4\3\4\3\4\3\4\3\4\5\4\36\n\4\3\4\3\4\3\4\3\4\3\4\3\4\7\4&\n\4\f"+
+		"\4\16\4)\13\4\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\6\3\6\3\7\3\7\3\b\3\b\3\b"+
+		"\2\3\6\t\2\4\6\b\n\f\16\2\5\3\2\21\23\3\2\f\16\3\2\b\13\63\2\20\3\2\2"+
+		"\2\4\23\3\2\2\2\6\35\3\2\2\2\b*\3\2\2\2\n\61\3\2\2\2\f\63\3\2\2\2\16\65"+
+		"\3\2\2\2\20\21\5\4\3\2\21\22\7\2\2\3\22\3\3\2\2\2\23\24\7\17\2\2\24\25"+
+		"\7\26\2\2\25\26\5\6\4\2\26\5\3\2\2\2\27\30\b\4\1\2\30\31\7\5\2\2\31\32"+
+		"\5\6\4\2\32\33\7\6\2\2\33\36\3\2\2\2\34\36\5\b\5\2\35\27\3\2\2\2\35\34"+
+		"\3\2\2\2\36\'\3\2\2\2\37 \f\5\2\2 !\7\3\2\2!&\5\6\4\6\"#\f\4\2\2#$\7\4"+
+		"\2\2$&\5\6\4\5%\37\3\2\2\2%\"\3\2\2\2&)\3\2\2\2\'%\3\2\2\2\'(\3\2\2\2"+
+		"(\7\3\2\2\2)\'\3\2\2\2*+\5\16\b\2+,\7\7\2\2,-\5\f\7\2-.\7\5\2\2./\5\n"+
+		"\6\2/\60\7\6\2\2\60\t\3\2\2\2\61\62\t\2\2\2\62\13\3\2\2\2\63\64\t\3\2"+
+		"\2\64\r\3\2\2\2\65\66\t\4\2\2\66\17\3\2\2\2\5\35%\'";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

@@ -24,7 +24,8 @@ grammar DSL;
 dslText: createPlaylist EOF; // for future work in order to create a playlist (spotify) from the query provided
 createPlaylist: CREATE ID queryList;
 
-queryList:	queryList AND queryList
+queryList:	LPAR queryList RPAR
+			| queryList AND queryList
 			| queryList OR queryList
 			| query;
 
